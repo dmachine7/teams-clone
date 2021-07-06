@@ -1,0 +1,120 @@
+.navbar,
+.navbar-section,
+.navbar-profile {
+  background-color: var(--primaryColor);
+  display: flex;
+  color: var(--white);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar {
+  padding: 0.5rem 1rem;
+}
+
+.navbar-homelink {
+  color: var(--white);
+}
+
+.navbar-section {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.navbar-profile {
+  font-size: 0.85rem;
+}
+
+.navbar-section img {
+  height: 1.75rem;
+}
+
+.navbar-button, .navbar-join {
+  background-color: var(--accentColor);
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--white);
+  cursor: pointer;
+  margin: 0 1.5rem 0 0;
+}
+
+.navbar-join {
+  background-color: limegreen;
+}
+
+.navbar-join-input,
+.navbar-dropdown {
+  position: absolute;
+  width: 320px;
+  background-color: var(--white);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  right: 2rem;
+}
+
+.input-box {
+  border: 2px solid var(--primaryColor);
+  padding: 0.5rem 1rem;
+  width: 220px;
+  background-color: var(--white);
+}
+
+.input-button {
+  border: 2px solid var(--primaryColor);
+  padding: 0.5rem 1rem;
+  background-color: var(--primaryColor);
+  color: var(--white);
+}
+
+.profile-pic img {
+  border-radius: 50%;
+  height: 1.75rem;
+  cursor: pointer;
+}
+
+.navbar-dropdown {
+  display: none;
+  right: 0.5rem;
+  margin-top: 0;
+  color: var(--grey);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.profile-pic:hover .navbar-dropdown {
+  display: block;
+}
+
+.navbar-dropdown img {
+  border-radius: 0;
+  margin: 0 1rem 1rem 0;
+  width: 25%;
+  height: auto;
+}
+
+#logout-button {
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--white);
+  padding: 0.75rem 1.75rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+  background-color: tomato;
+}
+
+.dropdown-status input,
+.dropdown-status button {
+  padding: 0.45rem;
+  border: 2px solid var(--primaryColor);
+  margin: 0.5rem 0;
+}
+
+.dropdown-status button {
+  background-color: var(--primaryColor);
+  color: var(--white);
+}

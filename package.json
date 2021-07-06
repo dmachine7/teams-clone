@@ -1,0 +1,15 @@
+{
+  "name": "msteamsclone",
+  "version": "1.0.0",
+  "description": "Microsoft teams clone web application",
+  "scripts": {
+    "client": "cd frontend && npm start",
+    "server": "cd backend && npm run start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "Devang Agarwal",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^6.2.0"
+  }
+}

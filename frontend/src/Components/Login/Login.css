@@ -1,0 +1,25 @@
+.login-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.login-provider-button {
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--white);
+  padding: 0.75rem 1.75rem;
+  font-weight: 500;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+#login-google {
+  background-color: #db4a39;
+}
+
+#login-ms {
+  background-color: #00a4ef;
+}
