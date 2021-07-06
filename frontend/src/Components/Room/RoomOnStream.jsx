@@ -198,6 +198,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
   const leaveCall = (e) => {
     e.preventDefault();
     socket.disconnect();
+    toast.warn('Leaving room ...')
     setTimeout(() => {
       if (myStream) {
         myStream.getVideoTracks().forEach(item => item.stop());

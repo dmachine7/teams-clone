@@ -17,7 +17,7 @@ import "../Dashboard.css";
 const ScheduledMeeting = ({ meets }) => {
   const { agenda, name, token, time } = meets.meet && meets.meet;
   const timeStr = new Date(time*1000).toLocaleString();
-  console.log(meets)
+  
   return (
     <table className="scheduled-meet-table">
       <tr>
@@ -179,8 +179,6 @@ const Meeting = ({ user }) => {
     }
     setSchedule({ name: '', agenda: '', room: '' })
   }
-
-  console.log(meetings)
 
   return (
     <div className="db-comp-parent">
