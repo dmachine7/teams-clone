@@ -135,7 +135,6 @@ const Navbar = () => {
             { user.name && user.name } &nbsp; 
             <div className='profile-pic'>
               <img src={user.photo && user.photo} alt='profile' />
-              <DropDown user={user && user} />
             </div>
           </>
         }

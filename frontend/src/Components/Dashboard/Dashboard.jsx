@@ -9,6 +9,7 @@ import './Dashboard.css';
 import Meeting from './DashboardComponents/Meeting';
 import Teams from './DashboardComponents/Teams';
 import Profile from './DashboardComponents/Profile';
+import Loader from '../Loader/Loader';
 
 const Dashboard = () => {
   const user = useContext(UserContext);
@@ -60,16 +61,16 @@ const Dashboard = () => {
         <div className='dashboard-sidenav'>
           <button onClick={() => setComponent(<Teams user={userDetails && userDetails} />)}> <RiTeamLine /> <br /> <p>Teams</p> </button>
           <button onClick={() => setComponent(<Meeting user={user && user} />)}> <FaRegCalendarPlus /> <br /> <p>Meeting</p> </button>
-          <button onClick={() => setComponent(<Profile user={userDetails && userDetails} />)}> <FaRegUser /> <br /> <p>Profile</p> </button>
+          <button onClick={() => setComponent(<Profile user={user} />)}> <FaRegUser /> <br /> <p>Profile</p> </button>
           {/* <button> <CgNotes /> <br /> <p>Notes</p> </button> 
           <button> <CgSoftwareDownload /> <br /> <p>Download</p> </button> */}
         </div>
         { component ? component : <Meeting user={user && user} /> }
       </div>
     );
-  } else return <div> { redirect ? <Redirect to={redirect} /> : null } Loading...</div>
-  
-  
+  } else {
+    return <div> { redirect ? <Redirect to={redirect} /> : null } <Loader /> </div>
+  }
 }
 
 export default Dashboard;

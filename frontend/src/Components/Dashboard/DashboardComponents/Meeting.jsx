@@ -196,7 +196,9 @@ const Meeting = ({ user }) => {
           <h4>Your scheduled meetings</h4>
           <div>
             {
-              meetings && meetings.map(item => {
+              meetings && meetings.sort((a,b) => {
+                return a.meet.time - b.meet.time;
+              }).map(item => {
                 if (item.meet && (item.meet.time > currentSeconds)) {
                   return <ScheduledMeeting meets={item} />
                 } else return null;

@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   width: 70px;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-sidenav button {
@@ -48,7 +49,6 @@
   height: 98%;
   padding: 1% 2%;
   overflow-y: scroll;
-  border-left: 1px solid rgba(0, 0, 0, 0.1);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -102,4 +102,33 @@
 
 .scheduled-meet-table th, .scheduled-meet-table td {
   padding: 2px 0.5rem;
+}
+
+.db-comp-profile {
+  padding: 3%;
+  display: flex;
+  justify-content: center;
+  width: auto;
+  margin: 2rem auto;
+  box-shadow: 0 0.2rem 0.6rem 0 rgb(0 0 0 / 15%);
+}
+
+.db-comp-profile-info {
+  padding: 0 2rem;
+  border-left: var(--border);
+}
+
+.db-comp-profile-info div {
+  font-size: 0.85rem;
+  line-height: 2;
+  padding-bottom: 2rem;
+  border-bottom: var(--border);
+}
+
+.db-comp-profile img {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  margin: auto 2rem;
+  image-rendering: auto;
 }
