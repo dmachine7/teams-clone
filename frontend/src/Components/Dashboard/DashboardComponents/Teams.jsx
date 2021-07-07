@@ -12,8 +12,10 @@ import {
 import team1 from '../../../Assets/illust/team-1.svg';
 import team2 from '../../../Assets/illust/team-2.svg';
 import { toast } from "react-toastify";
+import Message from "./Message";
 
-const ChatBox = ({ members, message, id, name }) => {
+const ChatBox = ({ members, id, name, me }) => {
+  
   return (
     <div className='team-chat-box'>
       <div className='team-chat-box-head'> 
@@ -47,7 +49,7 @@ const ChatBox = ({ members, message, id, name }) => {
           }
         </div>
         <div className='team-chat-box-msg'>
-
+          <Message roomId={id} user={me && me} />
         </div>
       </div>
     </div>
@@ -155,12 +157,11 @@ const Teams = ({ user }) => {
           <div>
             {teams && teams.map((item) => {
               const members = item.data.members && item.data.members;
-              const message = item.data.message && item.data.message;
               const name = item.data.name && item.data.name;
               const id = item.id && item.id;
               return (
                 <button className='switch-team-button'
-                  onClick={() => setCurrentTeam(<ChatBox members={members} message={message} name={name} id={id} />)}
+                  onClick={() => setCurrentTeam(<ChatBox members={members} name={name} id={id} me={displayName && displayName} />)}
                 > {name} </button>
               )
             })}

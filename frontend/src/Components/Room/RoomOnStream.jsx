@@ -153,9 +153,15 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     socket.on('message', (name, msg, time) => {
       const box = createMsg(name, msg, time);
       messageBox.appendChild(box);
+      updateScroll();
     })
     
   }, []);
+
+  const updateScroll = () => {
+    var element = document.getElementById("chat-box");
+    element.scrollTop = element.scrollHeight;
+  }
 
   const toggleVideo = (e) => {
     e.preventDefault();
