@@ -94,9 +94,9 @@ video {
 }
 
 .utility-button {
-  margin: 0 1rem ;
-  width: 50px;
-  height: 50px;
+  margin: 0 0.5rem ;
+  width: 45px;
+  height: 45px;
   border: none;
   border-radius: 50%;
   background-color: tomato;

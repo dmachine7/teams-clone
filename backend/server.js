@@ -24,7 +24,8 @@ app.use('/room', require('./rooms/create'));
 //setting up peerjs library
 const peerServer = ExpressPeerServer(server, {
   debug: true,
-  path: '/app'
+  path: '/app',
+  allow_discovery: true
 });
  
 app.use('/peerjs', peerServer);

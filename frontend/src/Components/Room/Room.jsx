@@ -3,6 +3,7 @@ import './Room.css';
 import RoomOnStream from './RoomOnStream';
 import camera from '../../Assets/illust/camera.svg';
 import { Redirect } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Room = (props) => {
   const token = props.match.params.room;
@@ -17,7 +18,9 @@ const Room = (props) => {
     }).then(stream => {
       window.localStream = stream;
       setStream(stream)
-    }).catch(err => console.log('streaming error: ' + err));
+    }).catch(err => {
+      toast.error('Please allow camera access and reload');
+    });
   };
 
   const stopAccess = () => {

@@ -24,7 +24,9 @@ const Message = ({ roomId, user }) => {
 
   const updateScroll = () => {
     var element = document.getElementById("tcb-msg-comp");
-    element.scrollTop = element.scrollHeight;
+    if (element) {
+      element.scrollTop = element.scrollHeight;
+    }
   }
 
   const sendMessage = (e) => {

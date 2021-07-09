@@ -6,7 +6,7 @@ import { UserContext } from "../../Provider/User";
 import { Redirect, useHistory } from 'react-router-dom';
 import { BiMicrophone, BiMicrophoneOff, BiCamera, BiCameraOff, BiPhone } from 'react-icons/bi';
 import { IoHandRightOutline } from 'react-icons/io5';
-// import { MdScreenShare, MdStopScreenShare } from 'react-icons/md';
+import { MdScreenShare, MdStopScreenShare } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { WhatsappIcon, WhatsappShareButton, EmailShareButton, EmailIcon } from 'react-share';
 
@@ -36,7 +36,8 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
   const [audioState, setAudio] = useState(true);
   const [videoState, setVideo] = useState(true);
   const [myMessage, setMessage] = useState("");
-  const myStream = passStream;
+  const [screenShare, setScreenShare] = useState(false);
+  const [myStream, setMyStream] = useState(passStream)
 
   const peer = new Peer(undefined, {
     host: 'localhost',
@@ -46,6 +47,22 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
 
   const addStream = (video, parentDiv, stream, videoGrid) => {
     video.srcObject = stream;
+    video.addEventListener('click', () => {
+      let screen = document.getElementById('share-screen-grid');
+      let bigVideo = document.createElement('video');
+      bigVideo.srcObject = stream;
+      bigVideo.addEventListener('loadedmetadata', () => {
+        bigVideo.play()
+      })
+      bigVideo.addEventListener('click', () => {
+        bigVideo.remove()
+      })
+      if (screen.hasChildNodes()) {
+        screen.replaceChild(bigVideo, screen.childNodes[0]);
+      } else {
+        screen.appendChild(bigVideo)
+      }
+    })
     video.addEventListener('loadedmetadata', () => {
       video.play();
     })
@@ -75,7 +92,6 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       addStream(video, parentDiv, userVideoStream, videoGrid)
     })
     call.on('close', () => {
-      console.log('onclose')
       parentDiv.remove();
     })
 
@@ -83,8 +99,6 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
   }
 
   const closeCall = (userId) => {
-    console.log('close')
-    console.log(userId);
     if (peers[userId]) peers[userId].close();
   }
 
@@ -133,6 +147,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       call.on('close', () => {
         parentDiv.remove()
       })
+
       peers[call.peer] = call;
     })
   
@@ -156,43 +171,31 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       updateScroll();
     })
     
-  }, []);
+  }, [myStream]);
 
   const updateScroll = () => {
     var element = document.getElementById("chat-box");
-    element.scrollTop = element.scrollHeight;
+    if (element) {
+      element.scrollTop = element.scrollHeight;
+    }
   }
 
   const toggleVideo = (e) => {
     e.preventDefault();
     const myVideo = document.getElementById(user.uid);
     const mystream = myVideo.srcObject.getVideoTracks()[0];
-    if (mystream.enabled == false) {
-      mystream.enabled = true;
-      setVideo(!videoState);
-      return;
-    }
-    if (mystream.enabled == true) {
-      mystream.enabled = false;
-      setVideo(!videoState);
-      return;
-    }
+    mystream.enabled ? mystream.enabled = false : mystream.enabled = true;
+    setVideo(!videoState);
+    return;
   }
 
   const toggleAudio = (e) => {
     e.preventDefault();
     const myVideo = document.getElementById(user.uid);
     const mystream = myVideo.srcObject.getAudioTracks()[0];
-    if (mystream.enabled == false) {
-      mystream.enabled = true;
-      setAudio(!audioState);
-      return;
-    }
-    if (mystream.enabled == true) {
-      mystream.enabled = false;
-      setAudio(!audioState);
-      return;
-    }
+    mystream.enabled ? mystream.enabled = false : mystream.enabled = true;
+    setAudio(!audioState);
+    return;
   }
 
   const raiseHand = (e) => {
@@ -203,6 +206,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
 
   const leaveCall = (e) => {
     e.preventDefault();
+    peer.disconnect();
     socket.disconnect();
     toast.warn('Leaving room ...')
     setTimeout(() => {
@@ -229,6 +233,56 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       socket.emit('send-message', token, name, myMessage, new Date().toLocaleTimeString().substring(0,7))
     }
     setMessage("")
+  }
+
+  const shareScreen = (e, screenState) => {
+    e.preventDefault();
+
+    let stopScreenStream = () => {
+      let elem = document.getElementById('share-screen-stream-video');
+      if (elem) {
+        let obj = elem.srcObject.getVideoTracks();
+        obj.forEach(item => {
+          item.enabled = false;
+          item.stop();
+        })
+      }
+      if (peers[peer.id]) peers[peer.id].close()
+      peer.disconnect()
+    }
+    
+    if (screenState) {
+      window.navigator.mediaDevices.getDisplayMedia({
+        video: {
+          cursor: "always"
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true
+        }
+      }).then(stream => {
+        peer.listAllPeers((res) => {
+          res.forEach((id) => {
+            let metadata = {
+              myId: 'share-screen-stream-video',
+              myName: user && user.displayName
+            }
+            peer.call(id, stream, {metadata})
+          })
+        })
+        stream.getVideoTracks()[0].onended = function () {
+          setScreenShare(false);
+          stopScreenStream();
+        }
+        const name = user && user.displayName ? user.displayName : "Someone"
+        socket.emit('send-message', token, name, "I am presenting. Click to zoom in/ click on big screen to zoom out.", new Date().toLocaleTimeString().substring(0,7))
+        
+      })
+    } else {
+      stopScreenStream()
+    }
+
+    setScreenShare(screenState);
   }
 
   return (
@@ -271,6 +325,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
           <div>
             <button title={ videoState ? "Turn video off" : "Turn video on" } onClick={(e) => toggleVideo(e)} className='utility-button'> { videoState ? <BiCamera /> : <BiCameraOff /> } </button>
             <button title={ audioState ? "Turn audio off" : "Turn audio on" } onClick={(e) => toggleAudio(e)} className='utility-button'> { audioState ? <BiMicrophone /> : <BiMicrophoneOff /> } </button>
+            <button title={ screenShare ? "Please click stop sharing in dialog box" : "Share screen" } onClick={(e) => shareScreen(e, !screenShare)} className='utility-button'> { screenShare ? <MdStopScreenShare /> : <MdScreenShare /> } </button>
             <button title="Raise hand" onClick={(e) => raiseHand(e)} className='utility-button'> <IoHandRightOutline /> </button>
             <button title="Leave call" onClick={(e) => leaveCall(e)} className='utility-button'> <BiPhone /></button>
           </div>
