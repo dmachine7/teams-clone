@@ -14,7 +14,27 @@ import team2 from '../../../Assets/illust/team-2.svg';
 import { toast } from "react-toastify";
 import Message from "./Message";
 
-const ChatBox = ({ members, id, name, me }) => {
+const ChatBox = ({ members, id, name, me, uid }) => {
+
+  const leaveTeam = (e) => {
+    e.preventDefault();
+    if (me && uid && id) {
+      teamsRef.doc(id).update({
+        members: firebase.firestore.FieldValue.arrayRemove({
+          membername: me,
+          memberid: uid
+        })
+      });
+      
+      userRef.doc(uid).update({
+        teams: firebase.firestore.FieldValue.arrayRemove(id)
+      }).then(() => toast.warn('Team left'))
+
+    } else {
+      toast.error('Error leaving team')
+    }
+    console.log('succese')
+  }
   
   return (
     <div className='team-chat-box'>
@@ -41,6 +61,7 @@ const ChatBox = ({ members, id, name, me }) => {
       </div>
       <div className='team-chat-box-detail'>
         <div className='team-chat-box-member'>
+          <button className='leave-team-button' onClick={(e) => leaveTeam(e)}>Leave team</button>
           <h4>Members</h4>
           {
             members.map(item => {
@@ -161,7 +182,7 @@ const Teams = ({ user }) => {
               const id = item.id && item.id;
               return (
                 <button className='switch-team-button'
-                  onClick={() => setCurrentTeam(<ChatBox members={members} name={name} id={id} me={displayName && displayName} />)}
+                  onClick={() => setCurrentTeam(<ChatBox members={members} name={name} id={id} me={displayName && displayName} uid={uid && uid} />)}
                 > {name} </button>
               )
             })}

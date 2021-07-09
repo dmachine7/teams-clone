@@ -3,10 +3,10 @@ import './Room.css';
 import io from 'socket.io-client';
 import Peer from 'peerjs';
 import { UserContext } from "../../Provider/User";
-import { Redirect, useHistory } from 'react-router-dom';
 import { BiMicrophone, BiMicrophoneOff, BiCamera, BiCameraOff, BiPhone } from 'react-icons/bi';
 import { IoHandRightOutline } from 'react-icons/io5';
 import { MdScreenShare, MdStopScreenShare } from 'react-icons/md';
+import { ImExit } from 'react-icons/im';
 import { toast } from 'react-toastify';
 import { WhatsappIcon, WhatsappShareButton, EmailShareButton, EmailIcon } from 'react-share';
 
@@ -327,7 +327,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
             <button title={ audioState ? "Turn audio off" : "Turn audio on" } onClick={(e) => toggleAudio(e)} className='utility-button'> { audioState ? <BiMicrophone /> : <BiMicrophoneOff /> } </button>
             <button title={ screenShare ? "Please click stop sharing in dialog box" : "Share screen" } onClick={(e) => shareScreen(e, !screenShare)} className='utility-button'> { screenShare ? <MdStopScreenShare /> : <MdScreenShare /> } </button>
             <button title="Raise hand" onClick={(e) => raiseHand(e)} className='utility-button'> <IoHandRightOutline /> </button>
-            <button title="Leave call" onClick={(e) => leaveCall(e)} className='utility-button'> <BiPhone /></button>
+            <button title="Leave call" onClick={(e) => leaveCall(e)} className='utility-button'><ImExit /></button>
           </div>
         </div>
       </div>
