@@ -1,3 +1,7 @@
+/**
+ * Login component
+ */
+
 import React, { useEffect, useContext, useState } from "react";
 import { signInWithGoogle, signInWithMicrosoft } from "../../Helper/Firebase";
 import { Redirect } from 'react-router-dom';

@@ -24,14 +24,14 @@
 }
 
 .team-chat-box-member {
-  width: 300px;
+  width: 30%;
   border-right: var(--border);
   height: 100%;
   overflow-y: scroll;
 }
 
 .team-chat-box-msg {
-  width: 100%;
+  width: 70%;
   height: 100%;
   position: relative;
 }
@@ -63,8 +63,10 @@
 }
 
 .tcb-msg-comp {
+  width: auto;
   height: 90%;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .tcb-msg-input {
@@ -83,7 +85,7 @@
   background-color: inherit;
   border: 1px solid var(--grey);
   border-radius: 1rem;
-  width: 70%;
+  width: 60%;
 }
 
 .tcb-msg-input button {
@@ -94,4 +96,8 @@
   background-color: var(--primaryColor);
   width: max-content;
   border-radius: 1rem;
+}
+
+@media only screen and (max-width: 1200px) {
+
 }

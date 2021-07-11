@@ -1,3 +1,10 @@
+/**
+ * Dashboard Teams component
+ * @param [Team component] {user} user detail to fetch team details
+ * @description allows to create/join team
+ * @returns list of user teams
+ */
+
 import React, { useEffect, useState } from "react";
 import firebase from "firebase";
 import { userRef, teamsRef } from "../../../Helper/Firebase";
@@ -14,11 +21,14 @@ import team2 from '../../../Assets/illust/team-2.svg';
 import { toast } from "react-toastify";
 import Message from "./Message";
 
+//Designed and grouped chat box component here to avoid multiple imports
 const ChatBox = ({ members, id, name, me, uid }) => {
 
+  //user leave team handler
   const leaveTeam = (e) => {
     e.preventDefault();
     if (me && uid && id) {
+      //removing user data from teams database
       teamsRef.doc(id).update({
         members: firebase.firestore.FieldValue.arrayRemove({
           membername: me,
@@ -26,6 +36,7 @@ const ChatBox = ({ members, id, name, me, uid }) => {
         })
       });
       
+      //removing teams data from user database
       userRef.doc(uid).update({
         teams: firebase.firestore.FieldValue.arrayRemove(id)
       }).then(() => toast.warn('Team left'))
@@ -33,7 +44,6 @@ const ChatBox = ({ members, id, name, me, uid }) => {
     } else {
       toast.error('Error leaving team')
     }
-    console.log('succese')
   }
   
   return (
@@ -77,12 +87,16 @@ const ChatBox = ({ members, id, name, me, uid }) => {
   )
 }
 
+//main teams component
 const Teams = ({ user }) => {
+
+  const [userDetails, setUserDetails] = useState(null);
+
+  //to store my teams data
   const [teams, setTeams] = useState([]);
   const [myTeams, setMyTeams] = useState([]);
-  const [userDetails, setUserDetails] = useState(null);
   const [currentTeam, setCurrentTeam] = useState(null);
-
+ 
   const { displayName, uid } = user && user;
 
   const [newTeam, setNewTeam] = useState({
@@ -106,6 +120,7 @@ const Teams = ({ user }) => {
   const [joinCode, setJoincode] = useState("")
   const { name } = newTeam;
 
+  //fetching user details after component mounting
   useEffect(() => {
     setUserDetails(null);
     setMyTeams([]);
@@ -120,6 +135,7 @@ const Teams = ({ user }) => {
     })
   }, [uid]);
 
+  //fetching teams of the user from teams database
   useEffect(() => {
     teamsRef.onSnapshot((doc) => {
       setTeams([])
@@ -135,6 +151,7 @@ const Teams = ({ user }) => {
     setNewTeam({...newTeam, [property]: e.target.value});
   }
 
+  //create team handler
   const createTeam = async (e) => {
     e.preventDefault();
     teamsRef.add(newTeam)
@@ -148,6 +165,7 @@ const Teams = ({ user }) => {
     .catch(err => toast.error('Error creating team'))
   }
 
+  //join team handler
   const joinTeam = (e) => {
     e.preventDefault();
     if (userDetails && userDetails.teams) {
@@ -189,6 +207,10 @@ const Teams = ({ user }) => {
           </div>
         </div>
       </div>
+      {/**
+       * If user selected a team -> display chat box
+       * else display create/join team page
+       */}
       { currentTeam ? 
         <div className="db-comp-main">
           { currentTeam }

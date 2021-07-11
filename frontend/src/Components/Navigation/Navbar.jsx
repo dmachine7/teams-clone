@@ -1,98 +1,37 @@
-import React, { useContext, useEffect, useState } from 'react';
+/**
+ * Navigation bar 
+ * [Features] Start Meeting
+ * [Features] Join Meeting
+ * [Features] Name and profile picture
+ */
+
+import React, { useContext, useState } from 'react';
 import './Navbar.css';
 import teamslogo from '../../Assets/logos/microsoft-teams-1.svg'
 import { Link, Redirect } from 'react-router-dom';
 import { UserContext } from "../../Provider/User";
-import { findUser, logOut, updateUsers } from "../../Helper/Firebase";
-import { FiEdit3 } from 'react-icons/fi';
 import { createRoom } from '../../Helper/RoomHelper';
 import { toast } from 'react-toastify';
 
-const DropDown = (props) => {
-  const { name, email, photo, id, verified, status } = props.user;
-
-  const [showStatusInput, setShowStatusInput] = useState(false);
-  const [newStatus, setNewStatus] = useState(status && status);
-
-  const handleChange = (e) => {
-    setNewStatus(e.target.value);
-  }
-
-  const handleSubmit = async () => {
-    const user = {
-      displayName: name,
-      email: email,
-      photoURL: photo,
-      status: newStatus,
-      emailVerified: verified,
-      uid: id
-    }
-    await updateUsers(user);
-    setShowStatusInput(!showStatusInput);
-  }
-
-  return (
-    <div className='navbar-dropdown'>
-      <div style={{display: "flex"}}>
-        <img src={photo && photo} alt='profile' />
-        <div>
-          {name && name} <br />
-          {email && email}
-        </div>
-      </div>
-      <hr />
-      <div className='dropdown-status'>
-        Status: <span style={{ color: 'green' }}>{newStatus && newStatus}</span> &nbsp; <span onClick={() => {setShowStatusInput(!showStatusInput)}}><FiEdit3 /></span> <br />
-        {
-          showStatusInput ? <div><input placeholder='Type your new status...' onChange={(e) => handleChange(e)} /><button onClick={handleSubmit}>Update</button></div> : null
-        }
-        
-      </div>
-      <hr />
-      <div>
-        <button onClick={logOut} id='logout-button'>Log Out</button>
-      </div>
-    </div>
-  );
-};
-
 const Navbar = () => {
-  const userTemp = useContext(UserContext);
-  const [user, setUser] = useState({
-    name: "",
-    verified: false,
-    email: "",
-    id: "",
-    photo: "",
-    status: ""
-  });
 
+  const userTemp = useContext(UserContext);
   const [roomRedirect, setRedirect] = useState(null);
   const [join, setJoin] = useState(false);
 
-  useEffect(async () => {
-    if (userTemp && user.name == "") {
-      let userUpdate = await findUser(userTemp.uid);
-      if (userUpdate) {
-        setUser({
-          name: userUpdate.displayName,
-          verified: userUpdate.emailVerified,
-          email: userUpdate.email,
-          id: userUpdate.uid,
-          photo: userUpdate.photoURL,
-          status: userUpdate.status
-        })
-      }
-    }
-  }, [userTemp, user, findUser]);
-
+  //start instant meeting handler
   const redirectToRoom = async (e) => {
     e.preventDefault();
-    const roomId = await createRoom();
-    toast.info('Joining room ...');
-    return setRedirect(roomId);
+    createRoom()
+    .then(res => {
+      toast.info('Joining room ...');
+      setRedirect(res);
+    })
+    .catch(err => toast.error('Error creating room ...'))
+    
   }
 
+  //join meeting handler
   const joinRedirect = async (e) => {
     e.preventDefault();
     let id = document.getElementById('join-code').value;
@@ -132,9 +71,9 @@ const Navbar = () => {
                 </div>
               }
             </div>
-            { user.name && user.name } &nbsp; 
+            { userTemp.displayName && userTemp.displayName } &nbsp; 
             <div className='profile-pic'>
-              <img src={user.photo && user.photo} alt='profile' />
+              <img src={userTemp.photoURL && userTemp.photoURL} alt='profile' />
             </div>
           </>
         }

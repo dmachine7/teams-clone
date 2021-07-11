@@ -1,3 +1,7 @@
+/**
+ * Profile overview component
+ */
+
 import React, { useEffect, useState } from "react";
 import { userRef, logOut } from "../../../Helper/Firebase";
 import "../Dashboard.css";
@@ -20,6 +24,8 @@ const Profile = ({ user }) => {
       }
     })
   }, [uid]);
+
+  //status change handlers
 
   const handleChange = (e) => {
     setNewStatus(e.target.value);

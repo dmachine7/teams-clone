@@ -1,3 +1,9 @@
+/**
+ * Dashboard Teams component
+ * @description view/leave team - send message to team
+ * @returns Member list and chat box
+ */
+
 import React, { useEffect, useState } from "react";
 import firebase from "firebase";
 import { toast } from "react-toastify";
@@ -29,6 +35,7 @@ const Message = ({ roomId, user }) => {
     }
   }
 
+  //send message handler
   const sendMessage = (e) => {
     e.preventDefault();
     let currentTime = new Date().getTime()/1000;
@@ -38,7 +45,7 @@ const Message = ({ roomId, user }) => {
         sender: user || "User",
         timestamp: currentTime
       })
-    }).then(() => {console.log('done')})
+    })
     .catch(err => toast.error('Error sending message'));
     setNewMessage('');
   }
@@ -49,7 +56,7 @@ const Message = ({ roomId, user }) => {
         messages && messages.map((item, index) => {
           const { msg, sender, timestamp } = item && item;
           return (
-            <div className='message-div' key={index} style={{ width: 'max-content', minWidth: '300px' }}>
+            <div className='message-div' key={index} >
               <span>
                 <h5> {sender || "Undefined"} </h5>
                 <h6> {new Date(timestamp*1000).toLocaleString()} </h6>

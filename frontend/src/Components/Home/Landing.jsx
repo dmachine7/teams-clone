@@ -1,4 +1,8 @@
-import React from 'react';
+/**
+ * Landing page 
+ * -> Redirects to dashboard if already logged in
+ */
+
 import { Redirect } from "react-router-dom";
 import landing from '../../Assets/illust/undraw_through_the_park_lxnl.svg';
 import Login from '../Login/Login.jsx';

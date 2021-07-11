@@ -4,13 +4,8 @@ import { toast } from 'react-toastify';
 export const createRoom = async () => {
   let roomId;
 
-  //setting up headers to avoid cross-origin error [CORS]
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json'
-  };
-
-  await axios.post('/room/create', {}, headers)
+  //sending request to server to provide room token
+  await axios.post('https://teamscloneserver.herokuapp.com/room/create')
   .then(res => roomId = res.data)
   .catch(err => toast.error('Error creating room: ' + err));
   

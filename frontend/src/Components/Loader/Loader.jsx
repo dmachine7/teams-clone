@@ -1,3 +1,7 @@
+/**
+ * Loader component
+ */
+
 import './Loader.css';
 
 const Loader = () => {

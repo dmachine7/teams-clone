@@ -3,7 +3,16 @@ const app = express();
 const server = require('http').Server(app);
 const { ExpressPeerServer } = require('peer'); //peer server for wrapping webRTC
 
-const port = 8000 || process.env.PORT;
+let cors = require('cors')
+app.use(cors())
+
+app.use(function (req, res, next) {
+  //Enabling CORS
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+const port = process.env.PORT || 8000;
 
 //seeting up socket.io
 const io = require('socket.io')(server, {

@@ -1,3 +1,8 @@
+/**
+ * Pre-room component
+ * [purpose] Asks for user camera/microphone access
+ */
+
 import React, { useState } from 'react';
 import './Room.css';
 import RoomOnStream from './RoomOnStream';
@@ -11,6 +16,7 @@ const Room = (props) => {
 
   const [myStream, setStream] = useState(null);
 
+  //asking for camera/mic access
   const askAccess = () => {
     window.navigator.mediaDevices.getUserMedia({
       video: true,
@@ -23,6 +29,7 @@ const Room = (props) => {
     });
   };
 
+  //stopping all media access when requested
   const stopAccess = () => {
     if (window.localStream) {
       console.log(window.localStream.getVideoTracks())
@@ -37,7 +44,9 @@ const Room = (props) => {
     setTimeout(() => window.location.replace('/dashboard'), 500)
   }
 
+  //only logged in users can join room 
   if (sessionCheck) {
+    //if user stream is available then redirect to room
     if (myStream) {
       return <RoomOnStream passStream={myStream} token={token} stopStream={stopAccess} />
     } else {

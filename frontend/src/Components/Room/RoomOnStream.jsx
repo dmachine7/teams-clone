@@ -1,18 +1,29 @@
+/**
+ * Main room component
+ * @param {passStream} user stream
+ * @param {token} room unique id
+ * @description set up peer to peer connection
+ * @returns connection between peers [video/audio/chat]
+ */
+
 import React, { useEffect, useState, useContext } from 'react';
 import './Room.css';
 import io from 'socket.io-client';
 import Peer from 'peerjs';
 import { UserContext } from "../../Provider/User";
-import { BiMicrophone, BiMicrophoneOff, BiCamera, BiCameraOff, BiPhone } from 'react-icons/bi';
+
+//assets and icons
+import { BiMicrophone, BiMicrophoneOff, BiCamera, BiCameraOff } from 'react-icons/bi';
 import { IoHandRightOutline } from 'react-icons/io5';
 import { MdScreenShare, MdStopScreenShare } from 'react-icons/md';
 import { ImExit } from 'react-icons/im';
 import { toast } from 'react-toastify';
 import { WhatsappIcon, WhatsappShareButton, EmailShareButton, EmailIcon } from 'react-share';
 
-//our server is hosted by socket.io for peer to peer connection
-const socket = io.connect('http://localhost:8000');
+//set up a connection through socket.io client
+const socket = io.connect('https://teamscloneserver.herokuapp.com');
 
+//will return new message dom element
 const createMsg = (name, msg, time) => {
   const msgDiv = document.createElement('div');
   msgDiv.setAttribute('class', 'message-div')
@@ -30,21 +41,27 @@ const createMsg = (name, msg, time) => {
   return msgDiv;
 };
 
+//main room component
 const RoomOnStream = ({ passStream, token, stopStream }) => {
   const user = useContext(UserContext);
   const peers = [];
+
+  //media states
   const [audioState, setAudio] = useState(true);
   const [videoState, setVideo] = useState(true);
   const [myMessage, setMessage] = useState("");
   const [screenShare, setScreenShare] = useState(false);
   const [myStream, setMyStream] = useState(passStream)
 
+  //initializing unique peer id for user
   const peer = new Peer(undefined, {
-    host: 'localhost',
-    port: 8000,
-    path: '/peerjs/app'
+    host: 'teamscloneserver.herokuapp.com',
+    port: 443,
+    path: '/peerjs/app',
+    secure: true
   });
 
+  //to add stream in my dom
   const addStream = (video, parentDiv, stream, videoGrid) => {
     video.srcObject = stream;
     video.addEventListener('click', () => {
@@ -74,8 +91,8 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     }
   }
 
+  //to connect to user and make a call
   const connectToUser = async (userId, stream, videoGrid, uid, name) => {
-    console.log(userId, uid)
     //making call
     let metadata = {
       myName: user && user.displayName ? user.displayName : null,
@@ -98,10 +115,12 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     peers[userId] = call;
   }
 
+  //closing and removing disconnected peers
   const closeCall = (userId) => {
     if (peers[userId]) peers[userId].close();
   }
 
+  //setting up my stream and handling event emitters after component mounting
   useEffect(async () => {
 
     //DOM references
@@ -134,7 +153,6 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       call.answer(myStream);
       
       const metaData = call.metadata;
-      console.log(metaData.myId);
       const parentDiv = document.createElement('div');
       const videoName = document.createElement('h6');
       videoName.innerHTML = metaData.myName;
@@ -151,6 +169,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
       peers[call.peer] = call;
     })
   
+    //socket events
     socket.on('user-connected', async (userId, name, uid) => {
       toast.info(name + ' joined', { autoClose: 700 });
       setTimeout(() => { connectToUser(userId, myStream, videoGrid, uid, name) }, 1000)
@@ -180,6 +199,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     }
   }
 
+  //toggle video handler
   const toggleVideo = (e) => {
     e.preventDefault();
     const myVideo = document.getElementById(user.uid);
@@ -189,6 +209,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     return;
   }
 
+  //toggle audio handler
   const toggleAudio = (e) => {
     e.preventDefault();
     const myVideo = document.getElementById(user.uid);
@@ -198,12 +219,14 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     return;
   }
 
+  //raise hand emitter
   const raiseHand = (e) => {
     e.preventDefault();
     const name = user && user.displayName ? user.displayName : "Someone"
     socket.emit('notification', token, name);
   }
 
+  //peer disconnection and redirection
   const leaveCall = (e) => {
     e.preventDefault();
     peer.disconnect();
@@ -222,6 +245,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     }, 1000);
   }
 
+  //real time messaging handler
   const messageHandler = (e) => {
     e.preventDefault();
     setMessage(e.target.value);
@@ -235,6 +259,7 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
     setMessage("")
   }
 
+  //share screen handler
   const shareScreen = (e, screenState) => {
     e.preventDefault();
 
@@ -287,15 +312,19 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
 
   return (
     <div className='room'>
+
       <div className='room-video' id='video-grid'>
         <div id='share-screen-grid'></div>
       </div>
+
       <div className='room-chat' id='log'>
         <div className='room-id-share'>
+
           <div>
             Welcome to Room: <br />
             {token} <br />
           </div>
+
           <div>
             <WhatsappShareButton
               url={token}
@@ -313,22 +342,49 @@ const RoomOnStream = ({ passStream, token, stopStream }) => {
               <EmailIcon size={26} />
             </EmailShareButton>
           </div>
-        </div>
-        <div id='chat-box'>
 
         </div>
+
+        <div id='chat-box'></div>
+
         <div className='room-utility'>
+
           <div>
             <input placeholder="Type your message..." value={myMessage} onChange={(e) => messageHandler(e)} className='input-box' style={{ width: '100%' }}/>
             <button className='input-button' onClick={() => sendMessage()}>Send</button>
           </div>
+
           <div>
-            <button title={ videoState ? "Turn video off" : "Turn video on" } onClick={(e) => toggleVideo(e)} className='utility-button'> { videoState ? <BiCamera /> : <BiCameraOff /> } </button>
-            <button title={ audioState ? "Turn audio off" : "Turn audio on" } onClick={(e) => toggleAudio(e)} className='utility-button'> { audioState ? <BiMicrophone /> : <BiMicrophoneOff /> } </button>
-            <button title={ screenShare ? "Please click stop sharing in dialog box" : "Share screen" } onClick={(e) => shareScreen(e, !screenShare)} className='utility-button'> { screenShare ? <MdStopScreenShare /> : <MdScreenShare /> } </button>
-            <button title="Raise hand" onClick={(e) => raiseHand(e)} className='utility-button'> <IoHandRightOutline /> </button>
-            <button title="Leave call" onClick={(e) => leaveCall(e)} className='utility-button'><ImExit /></button>
+            <button 
+              title={ videoState ? "Turn video off" : "Turn video on" } 
+              onClick={(e) => toggleVideo(e)} className='utility-button'
+            > 
+              { videoState ? <BiCamera /> : <BiCameraOff /> } 
+            </button>
+
+            <button 
+              title={ audioState ? "Turn audio off" : "Turn audio on" } 
+              onClick={(e) => toggleAudio(e)} className='utility-button'
+            > 
+              { audioState ? <BiMicrophone /> : <BiMicrophoneOff /> } 
+            </button>
+
+            <button 
+              title={ screenShare ? "Please click stop sharing in dialog box" : "Share screen" }
+              onClick={(e) => shareScreen(e, !screenShare)} className='utility-button'
+            > 
+              { screenShare ? <MdStopScreenShare /> : <MdScreenShare /> } 
+            </button>
+
+            <button title="Raise hand" onClick={(e) => raiseHand(e)} className='utility-button'> 
+              <IoHandRightOutline /> 
+            </button>
+
+            <button title="Leave call" onClick={(e) => leaveCall(e)} className='utility-button'>
+              <ImExit />
+            </button>
           </div>
+
         </div>
       </div>
     </div>

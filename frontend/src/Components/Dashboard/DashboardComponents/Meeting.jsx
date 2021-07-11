@@ -1,86 +1,25 @@
+/**
+ * Dashboard Meeting component
+ * @param [Meeting component] {user} user detail to fetch team and meeting details
+ * @description allows to schedule/start meeting
+ * @returns list of scheduled meetings in chronological order
+ * [note] .onSnapshot on firebase references will allow realtime changes to reflect for the user
+ */
+
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import firebase from "firebase";
-import { Link, Redirect } from 'react-router-dom';
-import { meetingRef, userRef, teamsRef } from "../../../Helper/Firebase";
+import { Redirect } from 'react-router-dom';
+import { userRef, teamsRef } from "../../../Helper/Firebase";
 import { createRoom } from '../../../Helper/RoomHelper';
-import {
-  WhatsappIcon,
-  WhatsappShareButton,
-  EmailShareButton,
-  EmailIcon,
-} from "react-share";
+import ScheduledMeeting from './ScheduleMeeting.jsx';
 import meet1 from '../../../Assets/illust/meet-1.svg';
 import meet2 from '../../../Assets/illust/meet-2.svg';
 import "../Dashboard.css";
 
-const ScheduledMeeting = ({ meets }) => {
-  const { agenda, name, token, time } = meets.meet && meets.meet;
-  const timeStr = new Date(time*1000).toLocaleString();
-  
-  return (
-    <table className="scheduled-meet-table">
-      <tr>
-        <th>Meet: </th>
-        <td>{name}</td>
-      </tr>
-      <tr>
-        <th>Time: </th>
-        <td>{timeStr}</td>
-      </tr>
-      <tr>
-        <th>Team: </th>
-        <td>{meets.team && meets.team}</td>
-      </tr>
-      <tr>
-        <th>Room: </th>
-        <td>{token}</td>
-      </tr>
-      <tr>
-        <th>Agenda: </th>
-        <td>{agenda}</td>
-      </tr>
-      <tr>
-        <th>Share: </th>
-        <td>
-          <WhatsappShareButton
-            url={token}
-            title={
-              "[MEETING SCHEDULED] Hello! Meeting " +
-              name +
-              " is scheduled on " +
-              timeStr +
-              " with agenda: " +
-              agenda +
-              ". This is the room Id"
-            }
-            separator={" -> "}
-          >
-            <WhatsappIcon size={22} />
-          </WhatsappShareButton>
-          <EmailShareButton
-            url={token}
-            subject={"MEETING SCHEDULED"}
-            body={
-              "Hello! Meeting " +
-              name +
-              " is scheduled on " +
-              timeStr +
-              " with agenda: " +
-              agenda +
-              ". This is the room Id"
-            }
-            separator={" -> "}
-          >
-            <EmailIcon size={22} />
-          </EmailShareButton>
-        </td>
-      </tr>
-    </table>
-  )
-};
-
 const Meeting = ({ user }) => {
+
+  //variables for current meetings and new meetings
   const [meetings, setMeetings] = useState([]);
   const [redirect, setRedirect] = useState(null);
   const [schedule, setSchedule] = useState({
@@ -93,7 +32,6 @@ const Meeting = ({ user }) => {
 
   const [teams, setTeams] = useState([]);
   const [myTeams, setMyTeams] = useState([]);
-  const [userDetails, setUserDetails] = useState(null);
 
   const { name, agenda, team } = schedule;
   const { uid } = user && user;
@@ -104,9 +42,8 @@ const Meeting = ({ user }) => {
   let currentDate = new Date().toISOString();
 
   useEffect(() => {
-    setUserDetails(null);
     setMyTeams([]);
-
+    //fetch my teams
     userRef.doc(uid).get()
     .then((doc) => {
       if (doc.exists) {
@@ -115,6 +52,7 @@ const Meeting = ({ user }) => {
     })
   }, [uid]);
 
+  //update and display my scheduled meetings
   useEffect(() => {
     setTeams([])
     setMeetings([])
@@ -132,13 +70,18 @@ const Meeting = ({ user }) => {
     })
   }, [myTeams])
 
+  //start an instant meetinf handler
   const redirectToRoom = async (e) => {
     e.preventDefault();
-    const roomId = await createRoom();
-    toast.info('Joining room ...');
-    return setRedirect(roomId);
+    createRoom()
+    .then(res => {
+      toast.info('Joining room ...');
+      setRedirect(res);
+    })
+    .catch(err => toast.error('Error creating room ...'))
   }
 
+  //join meeting handler
   const joinRedirect = async (e) => {
     e.preventDefault();
     let id = document.getElementById('join-meet-code').value;
@@ -157,6 +100,7 @@ const Meeting = ({ user }) => {
     }
   }
 
+  //update teams database for meeting
   const scheduleMeeting = async () => {
     let token = await createRoom();
     if (token && schedule.team) {
@@ -190,6 +134,7 @@ const Meeting = ({ user }) => {
       <div className="db-comp-nav">
         <h2>Meetings</h2>
         <hr />
+
         <div>
           <h4>Your scheduled meetings</h4>
           <div>
@@ -205,7 +150,9 @@ const Meeting = ({ user }) => {
           </div>
         </div>
       </div>
+      
       <div className="db-comp-main">
+
         <div className='db-comp-meeting'>
           <img src={meet2} alt='image' />
           <button onClick={(e) => redirectToRoom(e)} style={{backgroundColor: 'var(--accentColor)'}}> Start an instant meeting </button> 
@@ -213,6 +160,7 @@ const Meeting = ({ user }) => {
           <input placeholder='Enter the code you recieved' id='join-meet-code' />
           <button onClick={(e) => joinRedirect(e)} style={{backgroundColor: 'limegreen'}} >Join</button>
         </div>
+
         <div className='db-comp-meeting'>
           <img src={meet1} alt='image' />
           <select value={team} onChange={(e) => inputHandler(e, 'team')}>
@@ -226,6 +174,7 @@ const Meeting = ({ user }) => {
           <input placeholder='Meeting agenda' value={agenda} onChange={(e) => inputHandler(e, 'agenda')} />   
           <button onClick={(e) => scheduleMeeting(e)}> Schedule Meeting </button>
         </div>
+
       </div>
     </div>
   );
