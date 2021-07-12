@@ -28,4 +28,9 @@ https://teamscloneserver.herokuapp.com/ <br />
 <img src="https://drive.google.com/uc?export=view&id=1jZ4-7QxfxdVjBQnyycD8pANPtescrJt_" alt="Teams-Clone" border="0">
 <img src="https://drive.google.com/uc?export=view&id=1VDvmd6I_aLYlIZ_MGtwH-wUFu1qWUMXc" alt="Teams-Clone" border="0">
 
+### Note
+* This is a PWA and can be installed on system.
+* Meeting requires stable internet connection from both sides.
+* This version is made for Laptop/PCs [Big screens]
+
 #### Please visit the site for a better experience 😊
